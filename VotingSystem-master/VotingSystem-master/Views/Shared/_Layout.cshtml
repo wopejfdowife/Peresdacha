@@ -1,0 +1,142 @@
+﻿@* Объявление типа документа HTML5 *@
+<!DOCTYPE html>
+@* Открывающий тег html с указанием языка страницы (русский) *@
+<html lang="ru">
+@* Начало секции head — метаданные страницы и подключение стилей *@
+<head>
+    @* Мета-тег: кодировка символов UTF-8 (поддержка русских букв) *@
+    <meta charset="utf-8" />
+    @* Мета-тег: адаптивная вёрстка для мобильных устройств *@
+    @* width=device-width — ширина страницы равна ширине экрана, initial-scale=1.0 — масштаб по умолчанию *@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @* Заголовок страницы: берётся из ViewData["Title"] каждой страницы + суффикс "Система голосования" *@
+    <title>@ViewData["Title"] — Система голосования</title>
+    @* Тег для будущего использования importmap (модули JavaScript) *@
+    <script type="importmap"></script>
+    @* Подключение стилей Bootstrap 5 (локальная копия в wwwroot/lib/bootstrap) *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @* Подключение иконок Bootstrap Icons из CDN (внешний источник) *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    @* Подключение собственных стилей сайта (wwwroot/css/site.css) *@
+    @* asp-append-version="true" — добавляет версию файла (кеширование обновлений) *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @* Подключение скомпилированного CSS (scoped CSS) проекта *@
+    <link rel="stylesheet" href="~/VotingSystem.styles.css" asp-append-version="true" />
+</head>
+@* Начало тела страницы *@
+<body>
+    @* Шапка сайта *@
+    <header>
+        @* Навигационная панель Bootstrap: адаптивная, с нижней границей и тенью *@
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                @* Логотип/бренд сайта — ссылка на главную страницу, жирный шрифт *@
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-check2-square"></i> Система голосования
+                </a>
+                @* Кнопка-«бургер» для сворачивания меню на мобильных устройствах *@
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    @* Иконка «бургера» (три полоски) *@
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                @* Контейнер меню: разворачивается/сворачивается, элементы распределены по концам *@
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    @* Левый блок навигации, растягивающийся на всю ширину *@
+                    <ul class="navbar-nav flex-grow-1">
+                        @* Пункт меню — Главная (иконка дома) *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i> Главная</a>
+                        </li>
+                        @* Пункт меню — Кандидаты (иконка людей) *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Candidates" asp-action="Index"><i class="bi bi-people"></i> Кандидаты</a>
+                        </li>
+                        @* Пункт меню — Благоустройство (иконка зданий) *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Districts" asp-action="Index"><i class="bi bi-buildings"></i> Благоустройство</a>
+                        </li>
+                        @* Если пользователь авторизован — показываем выпадающее меню «Мои голоса» *@
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            @* Выпадающий список с историей голосования *@
+                            <li class="nav-item dropdown">
+                                @* Кнопка выпадающего списка *@
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-hand-thumbs-up"></i> Мои голоса
+                                </a>
+                                @* Выпадающее меню со ссылками на истории голосов *@
+                                <ul class="dropdown-menu">
+                                    @* Ссылка на Мои голоса за кандидатов *@
+                                    <li><a class="dropdown-item" asp-controller="Candidates" asp-action="MyVotes">За кандидатов</a></li>
+                                    @* Ссылка на Мои голоса за благоустройство *@
+                                    <li><a class="dropdown-item" asp-controller="Districts" asp-action="MyVotes">За благоустройство</a></li>
+                                </ul>
+                            </li>
+                        }
+                        @* Пункт меню — О проекте (иконка информации) *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About"><i class="bi bi-info-circle"></i> О проекте</a>
+                        </li>
+                    </ul>
+                    @* Вставка частичного представления _LoginPartial (блок входа/регистрации/профиля) *@
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    @* Контейнер с основным содержимым страницы *@
+    <div class="container">
+        @* Главная область контента с отступом снизу *@
+        <main role="main" class="pb-3">
+            @* Отображение сообщения об успехе, если оно есть в TempData["Success"] *@
+            @if (TempData["Success"] != null)
+            {
+                @* Зелёное всплывающее уведомление (alert-success), закрываемое крестиком *@
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i> @TempData["Success"]
+                    @* Кнопка закрытия уведомления *@
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @* Отображение сообщения об ошибке, если оно есть в TempData["Error"] *@
+            @if (TempData["Error"] != null)
+            {
+                @* Красное всплывающее уведомление (alert-danger) *@
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+                    @* Кнопка закрытия уведомления *@
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @* Рендеринг основного содержимого дочернего представления (страницы) *@
+            @RenderBody()
+        </main>
+    </div>
+
+    @* Футер (подвал) сайта — верхняя граница и текст *@
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            @* Ряд из двух колонок (адаптивная сетка Bootstrap) *@
+            <div class="row">
+                @* Левая колонка: год и название системы с авторским знаком © *@
+                <div class="col-md-6">
+                    &copy; 2026 — Система голосования г. Владикавказ
+                </div>
+                @* Правая колонка: подпись разработчиков (выравнивание справа на широких экранах) *@
+                <div class="col-md-6 text-md-end">
+                    <small>Разработано: Неграш Н., Дзагоев М., Тотоев А.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+    @* Подключение библиотеки jQuery (необходима для Bootstrap и валидации) *@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @* Подключение JavaScript-бандла Bootstrap (навигация, модальные окна, уведомления) *@
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @* Подключение собственных JavaScript-скриптов сайта (wwwroot/js/site.js) *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @* Рендеринг дополнительной секции Scripts из дочерних представлений (если определена) *@
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

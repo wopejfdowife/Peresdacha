@@ -1,0 +1,63 @@
+@* Тип модели: список ImprovementVote *@
+@model List<ImprovementVote>
+@* Настройка страницы *@
+@{
+    // Заголовок страницы
+    ViewData["Title"] = "Мои голоса за благоустройство";
+}
+
+@* Заголовок страницы *@
+<h1 class="mb-4">Мои голоса за проекты благоустройства</h1>
+
+@* Условие: если у пользователя есть хотя бы один голос *@
+@if (Model.Any())
+{
+    @* Адаптивная таблица (скроллируется на маленьких экранах) *@
+    <div class="table-responsive">
+        @* Таблица с зелёной шапкой и отображением по hover *@
+        <table class="table table-hover align-middle">
+            @* Шапка таблицы *@
+            <thead class="table-success">
+                <tr>
+                    @* Заголовки столбцов *@
+                    <th>Проект</th>
+                    <th>Район</th>
+                    <th>Категория</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            @* Тело таблицы *@
+            <tbody>
+                @* Цикл перебора голосов пользователя *@
+                @foreach (var vote in Model)
+                {
+                    <tr>
+                        @* Название проекта (жирный) *@
+                        <td class="fw-semibold">@vote.Project?.Title</td>
+                        @* Название района *@
+                        <td>@vote.Project?.District?.Name</td>
+                        @* Категория проекта (серый бейдж) *@
+                        <td><span class="badge bg-secondary">@vote.Project?.Category</span></td>
+                        @* Дата голосования в формате дд.мм.гггг чч:мм *@
+                        <td>@vote.VoteDate.ToString("dd.MM.yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@* Иначе — у пользователя нет голосов за районы *@
+else
+{
+    @* Информационное уведомление с ссылкой на район *@
+    <div class="alert alert-info d-flex align-items-center gap-3">
+        @* Иконка информации *@
+        <i class="bi bi-info-circle fs-4"></i>
+        @* Текст уведомления *@
+        <span>Вы ещё не голосовали за проекты благоустройства.</span>
+        @* Кнопка-ссылка на страницу районов *@
+        <a asp-controller="Districts" asp-action="Index" class="btn btn-outline-success btn-sm ms-auto">
+            <i class="bi bi-buildings"></i> Районы города
+        </a>
+    </div>
+}

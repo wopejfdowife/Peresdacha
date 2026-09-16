@@ -1,0 +1,83 @@
+﻿@* Директива @page — превращает cshtml в Razor Page (страницу с маршрутизацией) *@
+@page
+@* Указание модели страницы: LoginModel (код из Login.cshtml.cs) *@
+@model LoginModel
+@* Настройка страницы *@
+@{
+    // Заголовок страницы — «Вход»
+    ViewData["Title"] = "Вход";
+}
+
+@* Заголовок страницы с отступом *@
+<h1 class="mb-4">@ViewData["Title"]</h1>
+@* Двухколоночная раскладка *@
+<div class="row">
+    @* Левая колонка — форма входа *@
+    <div class="col-md-6">
+        @* Секция формы *@
+        <section>
+            @* Форма входа с ID "account", метод POST *@
+            <form id="account" method="post">
+                @* Подзаголовок *@
+                <h5 class="mb-3 text-muted">Войдите, используя ваш аккаунт</h5>
+                @* Разделительная линия *@
+                <hr />
+                @* Блок ошибок формы (общая ошибка, например «неверный пароль») *@
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                @* Блок поля «Email» *@
+                <div class="mb-3">
+                    @* Подпись поля *@
+                    <label asp-for="Input.Email" class="form-label fw-semibold">Email</label>
+                    @* Поле ввода Email *@
+                    @* autocomplete="username" — подсказка браузеру для автозаполнения *@
+                    @* aria-required — атрибут доступности (для скринридеров) *@
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" style="padding-left: 12px;" />
+                    @* Место отображения ошибки валидации поля *@
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+                @* Блок поля «Пароль» *@
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label fw-semibold">Пароль</label>
+                    @* Поле ввода пароля (автозаполнение текущего пароля) *@
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" style="padding-left: 12px;" />
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+                @* Блок «Запомнить меня» *@
+                <div class="mb-3 form-check">
+                    @* Чекбокс (对其真实ность определяется по свойству RememberMe модели) *@
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    @* Подпись чекбокса *@
+                    <label class="form-check-label" asp-for="Input.RememberMe">Запомнить меня</label>
+                </div>
+                @* Кнопка «Войти» (синяя, на всю ширину) *@
+                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mb-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Войти
+                </button>
+                @* Кнопка-ссылка «Зарегистрироваться» (контурная) *@
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="w-100 btn btn-lg btn-outline-primary">
+                    <i class="bi bi-person-plus"></i> Зарегистрироваться как новый пользователь
+                </a>
+            </form>
+        </section>
+    </div>
+    @* Правая колонка — приветственный блок *@
+    <div class="col-md-6 d-flex align-items-center">
+        @* Серая карточка с иконкой и текстом *@
+        <div class="card bg-light border-0 w-100">
+            <div class="card-body text-center py-5">
+                @* Иконка пользователя (большого размера, синего цвета) *@
+                <i class="bi bi-person-check text-primary" style="font-size: 4rem;"></i>
+                @* Заголовок *@
+                <h5 class="mt-3">Добро пожаловать</h5>
+                @* Описание *@
+                <p class="text-muted">Войдите в систему, чтобы принять участие в голосовании за кандидатов и проекты благоустройства Владикавказа</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Секция Scripts: подключение клиентской валидации формы *@
+@section Scripts {
+    @* Вставка частичного представления с jQuery Validation скриптами *@
+    <partial name="_ValidationScriptsPartial" />
+}

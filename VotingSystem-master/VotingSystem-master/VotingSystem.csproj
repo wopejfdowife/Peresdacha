@@ -1,0 +1,40 @@
+<!-- Проеkт VotingSystem — файл конфигурации проекта .NET 9 (SDK: Microsoft.NET.Sdk.Web — ASP.NET Core) -->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Группа свойств проекта -->
+  <PropertyGroup>
+    <!-- Целевой фреймворк: .NET 9.0 -->
+    <TargetFramework>net9.0</TargetFramework>
+    <!-- Включение nullable-проверки типов (предупреждения о возможных null) -->
+    <Nullable>enable</Nullable>
+    <!-- Включение неявных using (автоимпорт наиболее частых пространств имён) -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Уникальный идентификатор User Secrets для безопасного хранения секретов (пароли, API-ключи) -->
+    <UserSecretsId>aspnet-VotingSystem-880c3294-d7f5-4042-9ad1-bbb8471d474e</UserSecretsId>
+  </PropertyGroup>
+
+  <!-- Группа файлов, которые нужно скопировать в выходную папку при сборке -->
+  <ItemGroup>
+    <!-- Файл БД SQLite: копируется при сборке, исключается из SingleFile-сборки -->
+    <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <!-- Группа NuGet-пакетов (внешние зависимости проекта) -->
+  <ItemGroup>
+    <!-- ASP.NET Core Diagnostics для EF Core — страница диагностики ошибок БД в dev-режиме -->
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
+    <!-- ASP.NET Core Identity с интеграцией Entity Framework — хранение учётных записей в БД -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
+    <!-- Готовый UI Identity — стандартные страницы входа, регистрации, управления аккаунтом -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.0" />
+    <!-- Провайдер SQLite для Entity Framework Core — поддержка SQLite в качестве БД -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <!-- Инструменты дизайна EF Core — генерация миграций через CLI -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" PrivateAssets="all" />
+    <!-- EF Core Tools — команды dotnet ef для управления миграциями -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
+    <!-- Инструменты генерации кода VS — генерация контроллеров, страниц Identity через scaffolding -->
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>

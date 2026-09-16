@@ -1,0 +1,51 @@
+﻿@* Импорт пространства имён Identity для работы с SignInManager *@
+@using Microsoft.AspNetCore.Identity
+@* Импорт пространства имён моделей (ApplicationUser) *@
+@using VotingSystem.Models
+@* Внедрение SignInManager для проверки статуса входа пользователя *@
+@inject SignInManager<ApplicationUser> SignInManager
+@* Внедрение UserManager для получения данных о пользователе *@
+@inject UserManager<ApplicationUser> UserManager
+
+@* Список элементов навигации (справа в шапке сайта) *@
+<ul class="navbar-nav">
+@* Условие: пользователь авторизован в системе *@
+@if (SignInManager.IsSignedIn(User))
+{
+    @* Пункт меню — выпадающий список с именем пользователя *@
+    <li class="nav-item dropdown">
+        @* Кнопка выпадающего списка с иконкой профиля и именем пользователя *@
+        @* User.Identity?.Name — логин (email) текущего пользователя *@
+        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle"></i> @User.Identity?.Name
+        </a>
+        @* Выпадающее меню с действиями пользователя (выровнено по правому краю) *@
+        <ul class="dropdown-menu dropdown-menu-end">
+            @* Ссылка на страницу управления аккаунтом (профиль) в области Identity *@
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="bi bi-gear"></i> Управление аккаунтом</a></li>
+            @* Разделительная линия в выпадающем меню *@
+            <li><hr class="dropdown-divider"></li>
+            @* Пункт меню с формой выхода из системы *@
+            <li>
+                @* Форма выхода: отправляет POST-запрос на страницу Logout с URL возврата на главную *@
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    @* Кнопка «Выйти» с иконкой выхода *@
+                    <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Выйти</button>
+                </form>
+            </li>
+        </ul>
+    </li>
+}
+@* Иначе — пользователь не авторизован *@
+else
+{
+    @* Пункт меню со ссылкой на страницу регистрации *@
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register"><i class="bi bi-person-plus"></i> Регистрация</a>
+    </li>
+    @* Пункт меню со ссылкой на страницу входа *@
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login"><i class="bi bi-box-arrow-in-right"></i> Войти</a>
+    </li>
+}
+</ul>

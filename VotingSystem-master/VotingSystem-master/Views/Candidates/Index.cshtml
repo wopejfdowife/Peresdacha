@@ -1,0 +1,92 @@
+@* Тип модели: CandidatesViewModel *@
+@model CandidatesViewModel
+@* Настройка страницы *@
+@{
+    // Заголовок страницы — «Кандидаты»
+    ViewData["Title"] = "Кандидаты";
+}
+
+@* Заголовок страницы *@
+<h1 class="mb-4">Список кандидатов</h1>
+
+@* Блок с фильтром по категориям *@
+<div class="mb-3">
+    @* Форма GET-фильтрации *@
+    <form method="get" class="row g-3 align-items-end">
+        @* Блок с выпадающим списком *@
+        <div class="col-auto">
+            @* Подпись поля *@
+            <label class="form-label fw-semibold">Категория:</label>
+            @* Выпадающий список категорий *@
+            @* onchange="this.form.submit()" — при выборе категории форма автоматически отправляется *@
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                @* Пункт «Все категории» (значение пустое — показать всех) *@
+                <option value="">Все категории</option>
+                @* Цикл по всем уникальным категориям *@
+                @foreach (var cat in Model.Categories)
+                {
+                    @* Пункт списка; selected — если это текущая выбранная категория *@
+                    <option value="@cat" selected="@(Model.SelectedCategory == cat)">@cat</option>
+                }
+            </select>
+        </div>
+        @* Если фильтр активен — показать кнопку сброса *@
+        @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+        {
+            @* Кнопка-ссылка сброса фильтра (возврат ко всем кандидатам) *@
+            <div class="col-auto">
+                <a asp-action="Index" class="btn btn-outline-secondary">Сбросить фильтр</a>
+            </div>
+        }
+    </form>
+</div>
+
+@* Сетка карточек кандидатов *@
+<div class="row">
+    @* Цикл перебора всех кандидатов *@
+    @foreach (var candidate in Model.Candidates)
+    {
+        @* Колонка: половина на md, треть на lg *@
+        <div class="col-md-6 col-lg-4 mb-4">
+            @* Карточка кандидата *@
+            <div class="card h-100 shadow-sm">
+                @* Блок с аватаром кандидата (центрированный) *@
+                <div class="text-center pt-3">
+                    @* Фото кандидата (80×80), скрытие при ошибке загрузки *@
+                    <img src="@candidate.PhotoUrl" alt="@candidate.FullName" width="80" height="80" onerror="this.style.display='none'" />
+                </div>
+                @* Тело карточки *@
+                <div class="card-body">
+                    @* ФИО кандидата (центрированный заголовок) *@
+                    <h5 class="card-title text-center">@candidate.FullName</h5>
+                    @* Бейдж категории (центрированный) *@
+                    <p class="text-center mb-2">
+                        <span class="badge bg-secondary">@candidate.Category</span>
+                    </p>
+                    @* Краткое описание (мелкий текст) *@
+                    <p class="card-text small">@candidate.Description</p>
+                </div>
+                @* Футер карточки: число голосов и кнопка «Подробнее» *@
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                    @* Число голосов *@
+                    <small class="text-muted">
+                        <i class="bi bi-hand-thumbs-up"></i> Голосов:
+                        @* Значение из словаря VoteCounts (или 0, если голосов нет) *@
+                        <span class="fw-bold">@(Model.VoteCounts.GetValueOrDefault(candidate.Id, 0))</span>
+                    </small>
+                    @* Кнопка «Подробнее» *@
+                    <a asp-action="Details" asp-route-id="@candidate.Id" class="btn btn-outline-primary btn-sm">
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* Если список кандидатов пуст — показать сообщение *@
+@if (!Model.Candidates.Any())
+{
+    @* Информационное уведомление *@
+    <div class="alert alert-info">Кандидаты не найдены</div>
+}

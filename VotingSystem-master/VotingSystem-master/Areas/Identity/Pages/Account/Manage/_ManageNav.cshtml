@@ -1,0 +1,23 @@
+@* Директива @inject — внедрение SignInManager для проверки наличия внешних входов *@
+@inject SignInManager<ApplicationUser> SignInManager
+@* Блок кода Razor *@
+@{
+    // Запрос списка схем внешней аутентификации (Google, Facebook и т.д.)
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+@* Блок навигации: вертикальное меню менеджмента *@
+@* nav-pills flex-column — вертикальные «пилюли» (выделение активного пункта фоном) *@
+<ul class="nav nav-pills flex-column">
+    @* Пункт «Профиль» *@
+    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index"><i class="bi bi-person"></i> Профиль</a></li>
+    @* Пункт «Email» *@
+    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email"><i class="bi bi-envelope"></i> Email</a></li>
+    @* Пункт «Пароль» *@
+    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword"><i class="bi bi-key"></i> Пароль</a></li>
+    @* Если есть внешние провайдеры — показать пункт «Внешние входы» *@
+    @if (hasExternalLogins)
+    {
+        @* Пункт «Внешние входы» (Google, Facebook и т.д.) *@
+        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins"><i class="bi bi-box-arrow-in-right"></i> Внешние входы</a></li>
+    }
+</ul>

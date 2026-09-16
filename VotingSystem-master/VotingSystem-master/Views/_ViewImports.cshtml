@@ -1,0 +1,16 @@
+﻿@* Директива @using VotingSystem — импорт пространства имён приложения (доступ к классам по имени без полного пути) *@
+@using VotingSystem
+@* Импорт пространства имён моделей данных (Candidate, Vote, District и т.д.) *@
+@using VotingSystem.Models
+@* Импорт пространства имён Identity (SignInManager, UserManager, ApplicationUser) *@
+@using Microsoft.AspNetCore.Identity
+@* Импорт пространства имён слоя данных (ApplicationDbContext, DbSeeder) *@
+@using VotingSystem.Data
+@* Директива @inject — внедрение сервиса SignInManager через DI для использования в представлениях *@
+@* Позволяет проверять, авторизован ли пользователь (IsSignedIn) *@
+@inject SignInManager<ApplicationUser> SignInManager
+@* Внедрение сервиса UserManager через DI для получения данных о пользователе в представлениях *@
+@inject UserManager<ApplicationUser> UserManager
+@* Директива @addTagHelper — регистрация встроенных тег-хелперов ASP.NET Core *@
+@* Включает работу атрибутов asp-controller, asp-action, asp-for, asp-page и т.д. *@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

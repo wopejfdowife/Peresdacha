@@ -1,0 +1,129 @@
+@* Тип модели: DistrictDetailsViewModel *@
+@model DistrictDetailsViewModel
+@* Настройка страницы *@
+@{
+    // Заголовок страницы — название района из модели
+    ViewData["Title"] = Model.District.Name;
+}
+
+@* Хлебные крошки (breadcrumb): ссылка «Районы» → текущий район *@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @* Ссылка на список районов *@
+        <li class="breadcrumb-item"><a asp-action="Index">Районы</a></li>
+        @* Текущий район (активный пункт, не кликабельный) *@
+        <li class="breadcrumb-item active">@Model.District.Name</li>
+    </ol>
+</nav>
+
+@* Блок с изображением и описанием района *@
+<div class="row mb-4">
+    @* Колонка с изображением (занимает третью часть ряда) *@
+    <div class="col-md-4 text-center">
+        @* Изображение района с ограничением высоты 150px, скрытие при ошибке *@
+        <img src="@Model.District.ImageUrl" alt="@Model.District.Name" class="img-fluid mb-3" style="max-height: 150px;" onerror="this.style.display='none'" />
+    </div>
+    @* Колонка с текстовой информацией *@
+    <div class="col-md-8">
+        @* Название района *@
+        <h2>@Model.District.Name</h2>
+        @* Описание района *@
+        <p>@Model.District.Description</p>
+        @* Ряд с населением и площадью *@
+        <div class="row text-muted small">
+            @* Население (форматированное число с разделителем пробелов) *@
+            <div class="col-auto"><i class="bi bi-people"></i> Население: @Model.District.Population.ToString("N0") чел.</div>
+            @* Площадь *@
+            <div class="col-auto"><i class="bi bi-geo-alt"></i> Площадь: @Model.District.Area км²</div>
+        </div>
+    </div>
+</div>
+
+@* Заголовок секции «Проекты благоустройства» *@
+<h3 class="mb-3">Проекты благоустройства</h3>
+@* Подсказка пользователю *@
+<p class="text-muted mb-4">Проголосуйте за проекты, которые хотите видеть в первую очередь</p>
+
+@* Ряд с карточками проектов *@
+<div class="row">
+    @* Цикл по всем проектам района *@
+    @foreach (var project in Model.District.Projects)
+    {
+        // Получение количества голосов за проект (или 0, если голосов нет)
+        var voteCount = Model.ProjectVoteCounts.GetValueOrDefault(project.Id, 0);
+        // Проверка: голосовал ли текущий пользователь за этот проект
+        var hasVoted = Model.VotedProjectIds.Contains(project.Id);
+
+        @* Колонка карточки проекта (половина ширины на md) *@
+        <div class="col-md-6 mb-3">
+            @* Карточка: зелёная рамка, если пользователь уже голосовал *@
+            <div class="card h-100 @(hasVoted ? "border-success" : "")">
+                <div class="card-body">
+                    @* Заголовок и бейдж категории *@
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            @* Название проекта *@
+                            <h5 class="card-title">@project.Title</h5>
+                            @* Бейдж категории (серый) *@
+                            <span class="badge bg-secondary mb-2">@project.Category</span>
+                        </div>
+                        @* Бейдж бюджета (жёлтый) *@
+                        <span class="badge bg-warning text-dark">@project.BudgetEstimate</span>
+                    </div>
+                    @* Описание проекта (мелким текстом) *@
+                    <p class="card-text small">@project.Description</p>
+                    @* Нижняя строка: количество голосов и кнопка голосования *@
+                    <div class="d-flex justify-content-between align-items-center">
+                        @* Число голосов *@
+                        <small class="text-muted">
+                            <i class="bi bi-hand-thumbs-up"></i> Голосов: <strong>@voteCount</strong>
+                        </small>
+                        @* Если пользователь аутентифицирован *@
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @* Если пользователь уже голосовал *@
+                            if (hasVoted)
+                            {
+                                @* Зелёный бейдж «Вы проголосовали» *@
+                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Вы проголосовали</span>
+                            }
+                            else
+                            {
+                                @* Форма голосования *@
+                                <form asp-action="VoteProject" method="post" class="m-0">
+                                    @* Скрытое поле с ID проекта *@
+                                    <input type="hidden" name="projectId" value="@project.Id" />
+                                    @* Кнопка «Голосовать» *@
+                                    <button type="submit" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-hand-thumbs-up"></i> Голосовать
+                                    </button>
+                                </form>
+                            }
+                        }
+                        @* Если пользователь не аутентифицирован *@
+                        else
+                        {
+                            @* Ссылка на вход *@
+                            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary btn-sm">
+                                Войдите, чтобы голосовать
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* Если у района нет проектов — показать сообщение *@
+@if (!Model.District.Projects.Any())
+{
+    @* Информационное уведомление *@
+    <div class="alert alert-info">Проекты благоустройства пока не добавлены</div>
+}
+
+@* Секция Scripts: дополнительные ресурсы для этой страницы *@
+@section Scripts {
+    @* Подключение иконок Bootstrap (дублируется для надёжности на этой странице) *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+}

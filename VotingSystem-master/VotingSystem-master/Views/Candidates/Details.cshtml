@@ -1,0 +1,119 @@
+@* Тип модели: Candidate *@
+@model Candidate
+@* Настройка страницы *@
+@{
+    // Заголовок страницы — ФИО кандидата
+    ViewData["Title"] = Model.FullName;
+}
+
+@* Хлебные крошки: Кандидаты → [ФИО кандидата] *@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @* Ссылка на список кандидатов *@
+        <li class="breadcrumb-item"><a asp-action="Index">Кандидаты</a></li>
+        @* Текущий кандидат *@
+        <li class="breadcrumb-item active">@Model.FullName</li>
+    </ol>
+</nav>
+
+@* Двухколоночная раскладка *@
+<div class="row">
+    @* Левая колонка (широкая) — карточка с информацией о кандидате *@
+    <div class="col-md-8">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                @* Шапка карточки: фото + ФИО + категория *@
+                <div class="d-flex align-items-center mb-3">
+                    @* Фото кандидата *@
+                    <img src="@Model.PhotoUrl" alt="@Model.FullName" width="64" height="64" class="me-3" onerror="this.style.display='none'" />
+                    @* Имя и категория *@
+                    <div>
+                        <h2 class="card-title mb-1">@Model.FullName</h2>
+                        <span class="badge bg-secondary">@Model.Category</span>
+                    </div>
+                </div>
+                @* Раздел «Описание» *@
+                <h5 class="mt-4">Описание</h5>
+                <p class="card-text">@Model.Description</p>
+                @* Раздел «Биография» *@
+                <h5>Биография</h5>
+                <p class="card-text">@Model.Biography</p>
+                @* Дата добавления кандидата *@
+                <p class="text-muted small">Добавлен: @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+            </div>
+        </div>
+    </div>
+
+    @* Правая колонка (узкая) — блок голосования *@
+    <div class="col-md-4">
+        @* Карточка с общим числом голосов *@
+        <div class="card mb-4 shadow-sm text-center">
+            <div class="card-body">
+                @* Иконка голоса *@
+                <i class="bi bi-hand-thumbs-up text-primary" style="font-size: 3rem;"></i>
+                @* Число голосов *@
+                <h3 class="display-6 mt-2">@ViewBag.VoteCount</h3>
+                @* Подпись *@
+                <p class="text-muted">всего голосов</p>
+            </div>
+        </div>
+
+        @* Если пользователь аутентифицирован *@
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            @* Карточка с формой голосования *@
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @* Заголовок блока *@
+                    <h5 class="card-title">Голосование</h5>
+                    @* Если пользователь уже голосовал *@
+                    @if (ViewBag.UserVote == true)
+                    {
+                        @* Зелёное уведомление *@
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i> Вы уже проголосовали за этого кандидата
+                        </div>
+                    }
+                    @* Иначе — показать форму голосования *@
+                    else
+                    {
+                        @* Форма голосования *@
+                        <form asp-action="Vote" method="post">
+                            @* Скрытое поле с ID кандидата *@
+                            <input type="hidden" name="candidateId" value="@Model.Id" />
+                            @* Блок комментария *@
+                            <div class="mb-3">
+                                @* Подпись поля *@
+                                <label class="form-label">Комментарий (необязательно)</label>
+                                @* Текстовое поле (textarea) *@
+                                @* maxlength — ограничение 200 символов *@
+                                <textarea name="comment" class="form-control" rows="2" maxlength="200" placeholder="Ваше мнение о кандидате"></textarea>
+                            </div>
+                            @* Кнопка «Голосовать» *@
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-check-lg"></i> Голосовать
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+        @* Если пользователь не аутентифицирован *@
+        else
+        {
+            @* Карточка с призывом войти *@
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    @* Иконка замка *@
+                    <i class="bi bi-person-lock" style="font-size: 2rem;"></i>
+                    @* Подсказка *@
+                    <p class="mt-2">Чтобы голосовать:</p>
+                    @* Кнопка «Войти» *@
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary btn-sm w-100 mb-1"><i class="bi bi-box-arrow-in-right"></i> Войти</a>
+                    @* Кнопка «Регистрация» *@
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-success btn-sm w-100"><i class="bi bi-person-plus"></i> Регистрация</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,72 @@
+﻿@* Регистрация страницы как Razor Page *@
+@page
+@* Модель страницы: EmailModel *@
+@model EmailModel
+@* Настройка страницы *@
+@{
+    // Заголовок страницы — «Управление Email»
+    ViewData["Title"] = "Управление Email";
+    // Активный пункт меню навигации
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+@* Заголовок страницы *@
+<h3>@ViewData["Title"]</h3>
+@* Сообщение о статусе операции *@
+<partial name="_StatusMessage" for="StatusMessage" />
+@* Двухколоночная раскладка *@
+<div class="row">
+    <div class="col-md-6">
+        @* Форма управления email *@
+        <form id="email-form" method="post">
+            @* Блок общих ошибок формы *@
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            @* Если email пользователя подтверждён *@
+            @if (Model.IsEmailConfirmed)
+            {
+                @* Блок с текущим email и галочкой *@
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label fw-semibold">Текущий Email</label>
+                    @* Поле email (disabled) с иконкой «подтверждено» *@
+                    <div class="input-group">
+                        <input asp-for="Email" class="form-control" disabled style="padding-left: 12px;" />
+                        <span class="input-group-text text-success"><i class="bi bi-check-circle"></i></span>
+                    </div>
+                </div>
+            }
+            @* Если email НЕ подтверждён *@
+            else
+            {
+                @* Блок с текущим email и кнопкой повторной отправки *@
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label fw-semibold">Текущий Email</label>
+                    @* Поле email (disabled) *@
+                    <input asp-for="Email" class="form-control" disabled style="padding-left: 12px;" />
+                    @* Кнопка «Отправить подтверждение» *@
+                    @* asp-page-handler — отправляет POST на обработчик SendVerificationEmailAsync *@
+                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-outline-info btn-sm mt-2">
+                        <i class="bi bi-envelope"></i> Отправить подтверждение
+                    </button>
+                </div>
+            }
+            @* Блок «Новый Email» *@
+            <div class="mb-3">
+                <label asp-for="Input.NewEmail" class="form-label fw-semibold">Новый Email</label>
+                @* Поле ввода нового email *@
+                <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" style="padding-left: 12px;" />
+                @* Ошибка валидации *@
+                <span asp-validation-for="Input.NewEmail" class="text-danger small"></span>
+            </div>
+            @* Кнопка «Сменить Email» *@
+            @* asp-page-handler — отправляет POST на обработчик ChangeEmailAsync *@
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">
+                <i class="bi bi-envelope-plus"></i> Сменить Email
+            </button>
+        </form>
+    </div>
+</div>
+
+@* Секция Scripts: клиентская валидация *@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

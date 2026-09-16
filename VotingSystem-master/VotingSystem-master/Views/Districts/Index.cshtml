@@ -1,0 +1,57 @@
+@* Тип модели: список District *@
+@model List<District>
+@* Настройка страницы *@
+@{
+    // Заголовок страницы — «Благоустройство районов»
+    ViewData["Title"] = "Благоустройство районов";
+}
+
+@* Центрированный блок-шапка с заголовком *@
+<div class="text-center mb-5">
+    @* Главный заголовок *@
+    <h1 class="display-5">Благоустройство районов Владикавказа</h1>
+    @* Подзаголовок с описанием назначения страницы *@
+    <p class="lead text-muted">Выберите район и проголосуйте за проекты по его благоустройству</p>
+</div>
+
+@* Сетка карточек районов (4 колонки на больших экранах) *@
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    @* Цикл перебора списка районов *@
+    @foreach (var district in Model)
+    {
+        @* Колонка карточки (flex для равной высоты карточек) *@
+        <div class="col d-flex">
+            @* Карточка района *@
+            <div class="card h-100 shadow-sm w-100">
+                @* Тело карточки: центрированный текст, flex-столбец *@
+                <div class="card-body text-center d-flex flex-column">
+                    @* Блок с изображением района *@
+                    <div class="mb-2">
+                        @* Изображение района (80×80), скрытие при ошибке загрузки *@
+                        <img src="@district.ImageUrl" alt="@district.Name" width="80" height="80" onerror="this.style.display='none'" />
+                    </div>
+                    @* Название района *@
+                    <h5 class="card-title">@district.Name</h5>
+                    @* Краткое описание (мелким серым текстом) *@
+                    <p class="card-text small text-muted flex-grow-1">@district.Description</p>
+                    @* Строка с населением и площадью *@
+                    <div class="d-flex justify-content-around mb-2 small text-muted">
+                        @* Население (формат: 85 000) *@
+                        <span><i class="bi bi-people"></i> @district.Population.ToString("N0")</span>
+                        @* Площадь *@
+                        <span><i class="bi bi-geo-alt"></i> @district.Area км²</span>
+                    </div>
+                    @* Блок с кнопкой и числом проектов *@
+                    <div class="mt-auto">
+                        @* Бейдж: количество проектов *@
+                        <p class="mb-2"><span class="badge bg-info">@district.Projects.Count проектов</span></p>
+                        @* Кнопка «Подробнее и голосование» *@
+                        <a asp-action="Details" asp-route-id="@district.Id" class="btn btn-outline-success w-100">
+                            <i class="bi bi-eye"></i> Подробнее и голосование
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

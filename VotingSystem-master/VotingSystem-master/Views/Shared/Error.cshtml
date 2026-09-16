@@ -1,0 +1,37 @@
+﻿@* Директива @model — указание типа модели для этого представления (ErrorViewModel) *@
+@model ErrorViewModel
+@* Блок кода C#: задание заголовка страницы *@
+@{
+    // Атрибут ViewData["Title"] — заголовок вкладки браузера
+    ViewData["Title"] = "Error";
+}
+
+@* Заголовок страницы с красным цветом (класс text-danger) *@
+<h1 class="text-danger">Error.</h1>
+@* Подзаголовок с сообщением о возникновении ошибки *@
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+@* Условие: показать ID запроса, если свойство ShowRequestId модели вернуло true *@
+@if (Model.ShowRequestId)
+{
+    <p>
+        @* Подпись «Request ID» жирным и код с идентификатором запроса *@
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+@* Подзаголовок раздела о режиме разработки *@
+<h3>Development Mode</h3>
+<p>
+    @* Текст: переключение на среду Development покажет больше информации об ошибке *@
+    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
+</p>
+<p>
+    @* Предупреждение: Development-среда не должна использоваться в продакшене *@
+    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
+    @* Пояснение: это может раскрыть чувствительные данные приложения пользователям *@
+    It can result in displaying sensitive information from exceptions to end users.
+    @* Инструкция: для локальной отладки установите переменную окружения ASPNETCORE_ENVIRONMENT=Development и перезапустите приложение *@
+    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
+    and restarting the app.
+</p>

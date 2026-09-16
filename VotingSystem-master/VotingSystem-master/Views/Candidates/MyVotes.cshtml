@@ -1,0 +1,69 @@
+@* Тип модели: список Vote *@
+@model List<Vote>
+@* Настройка страницы *@
+@{
+    // Заголовок страницы — «Мои голоса — кандидаты»
+    ViewData["Title"] = "Мои голоса — кандидаты";
+}
+
+@* Заголовок страницы *@
+<h1 class="mb-4">Мои голоса за кандидатов</h1>
+
+@* Условие: если у пользователя есть голоса *@
+@if (Model.Any())
+{
+    @* Адаптивная таблица *@
+    <div class="table-responsive">
+        @* Таблица с тёмной шапкой *@
+        <table class="table table-hover align-middle">
+            @* Шапка таблицы *@
+            <thead class="table-dark">
+                <tr>
+                    @* Заголовки столбцов *@
+                    <th>Кандидат</th>
+                    <th>Категория</th>
+                    <th>Дата голосования</th>
+                    <th>Комментарий</th>
+                </tr>
+            </thead>
+            @* Тело таблицы *@
+            <tbody>
+                @* Цикл перебора голосов пользователя *@
+                @foreach (var vote in Model)
+                {
+                    <tr>
+                        @* Ячейка «Кандидат» — ссылка на страницу деталей кандидата *@
+                        <td>
+                            @* Ссылка на Details по ID кандидата *@
+                            <a asp-action="Details" asp-route-id="@vote.CandidateId" class="fw-semibold text-decoration-none">
+                                @* Имя кандидата *@
+                                @vote.Candidate?.FullName
+                            </a>
+                        </td>
+                        @* Ячейка «Категория» — серый бейдж *@
+                        <td><span class="badge bg-secondary">@vote.Candidate?.Category</span></td>
+                        @* Ячейка «Дата» *@
+                        <td>@vote.VoteDate.ToString("dd.MM.yyyy HH:mm")</td>
+                        @* Ячейка «Комментарий» — тире, если комментария нет *@
+                        <td class="text-muted small">@(string.IsNullOrEmpty(vote.Comment) ? "—" : vote.Comment)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@* Иначе — у пользователя нет голосов за кандидатов *@
+else
+{
+    @* Информационное уведомление *@
+    <div class="alert alert-info d-flex align-items-center gap-3">
+        @* Иконка *@
+        <i class="bi bi-info-circle fs-4"></i>
+        @* Текст *@
+        <span>Вы ещё не голосовали за кандидатов.</span>
+        @* Кнопка-ссылка на список кандидатов *@
+        <a asp-controller="Candidates" asp-action="Index" class="btn btn-outline-primary btn-sm ms-auto">
+            <i class="bi bi-people"></i> Список кандидатов
+        </a>
+    </div>
+}
